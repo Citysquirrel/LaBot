@@ -1,5 +1,5 @@
 import json
-import discord2
+import discord
 
 def embedresult(response:json):
     rkrdlsfinal = ""

@@ -1,8 +1,8 @@
 import os
-import discord2
+import discord
 import asyncio
-from discord2.ext import commands
-from discord2.commands import Option
+from discord.ext import commands
+from discord.commands import Option
 import aiohttp
 import nest_asyncio
 import calmodule
