@@ -1,9 +1,8 @@
 import os
 import discord
 import asyncio
-from discord.ext import tasks, commands
-from discord.ui import Button, View
-from discord.commands import Option, SlashCommandGroup
+from discord.ext import commands
+from discord.commands import Option
 import aiohttp
 import nest_asyncio
 import calmodule
