@@ -1,5 +1,5 @@
 import json
-import discord
+import discord2
 
 def embedresult(response:json):
     rkrdlsfinal = ""
@@ -16,7 +16,7 @@ def embedresult(response:json):
     if rkrdlsfinal == "":
         rkrdlsfinal = "`각인 없음`\n"
     
-    embedresult = discord.Embed(color=discord.Color.from_rgb(255,255,255))
+    embedresult = discord2.Embed(color=discord2.Color.from_rgb(255,255,255))
     embedresult.set_author(name=response["Basic"]["Name"],icon_url=response["Basic"]["Class"]["Icon"])
     embedresult.add_field(
         name="**▫️ 기본 정보**",
@@ -68,7 +68,7 @@ def embedresult_lister(response:json):
     if lisrrr == "":
         lisrrr = "1,000레벨 이상 캐릭터 없음"
 
-    embedresult_lister = discord.Embed(title="캐릭터 목록", color=discord.Color.green())
+    embedresult_lister = discord2.Embed(title="캐릭터 목록", color=discord2.Color.green())
 
     embedresult_lister.add_field(
         name="▫️ 1,000레벨 이상 캐릭터만 표기됩니다.",
@@ -107,7 +107,7 @@ def embedskill(response:json):
         if skillfinal == "":
             skillfinal = "`스킬 없음`"
 
-    embedskill = discord.Embed(title="스킬", color=discord.Color.purple())
+    embedskill = discord2.Embed(title="스킬", color=discord2.Color.purple())
 
     embedskill.add_field(
         name="**▫️ "+"사용 스킬 포인트 "+response["Skill"]["SkillPoint"]["Used"]+" / 보유 스킬 포인트 "+response["Skill"]["SkillPoint"]["Total"]+"**",
@@ -146,7 +146,7 @@ def embedresult_jewlist(response:json):
         for cards in response["Card"]:
             cardlist = cardlist + ("`" + cards["Name"] + "` : " + cards["Effect"]) + "\n"
 
-    embedresult_jewlist = discord.Embed(title="보석&카드", color=discord.Color.dark_blue())
+    embedresult_jewlist = discord2.Embed(title="보석&카드", color=discord2.Color.dark_blue())
 
     embedresult_jewlist.add_field(
         name="▫️ 보석 목록",
@@ -191,7 +191,7 @@ def embedresult_goldget(response:json):
         goldn = goldn + (fnlr+"`"+ fnlr2 +"\n")
         onlygd = onlygd + "[🪙`"+ gold +"`]\n"
 
-    embedresult_goldget = discord.Embed(title="주급", color=discord.Color.gold(), description="**총 [💰`"+ str(response["Gold"]["TotalGold"]) +"`💰]**")
+    embedresult_goldget = discord2.Embed(title="주급", color=discord2.Color.gold(), description="**총 [💰`"+ str(response["Gold"]["TotalGold"]) +"`💰]**")
 
     embedresult_goldget.add_field(
         name="▫️ 주간 골드 획득 캐릭터",
@@ -220,7 +220,7 @@ def embedresult_sasalist(response:json, 닉네임:str):
     if i == 5:
         sasalist = sasalist + "\n(게시물이 개수가 5개 이상입니다. 5개 까지만 표시)" 
 
-    embedresult_sasalist = discord.Embed(title="사사게 (" + 닉네임 + ")", color=discord.Color.blurple(), description="상단 파란색 사사게 클릭시 이동", url=response["SasaUrl"])
+    embedresult_sasalist = discord2.Embed(title="사사게 (" + 닉네임 + ")", color=discord2.Color.blurple(), description="상단 파란색 사사게 클릭시 이동", url=response["SasaUrl"])
 
     embedresult_sasalist.add_field(
         name="▫️ 사사게 검색 정보(최근 1만 게시글)",
@@ -232,7 +232,7 @@ def embedresult_sasalist(response:json, 닉네임:str):
     return embedresult_sasalist
 
 def embedresult_auction(가격:int):
-    embedresult_auction = discord.Embed(title="💰 경매 입찰 최적가(판매시)", color=discord.Color.gold(), description="[🪙`"+str(가격)+"`]")
+    embedresult_auction = discord2.Embed(title="💰 경매 입찰 최적가(판매시)", color=discord2.Color.gold(), description="[🪙`"+str(가격)+"`]")
 
     embedresult_auction.add_field(
         name="▫️ 손익분기점",
@@ -252,7 +252,7 @@ def embedresult_auction(가격:int):
     return embedresult_auction
 
 def embedresult_crystal(response:json):
-    embedresult_crystal = discord.Embed(title="시세", color=discord.Color.gold())
+    embedresult_crystal = discord2.Embed(title="시세", color=discord2.Color.gold())
 
     embedresult_crystal.add_field(
         name="**▫️ 구매가**",
@@ -275,7 +275,7 @@ def embedresult_island(response:json):
     for island in response["Island"]:
         advenisland = advenisland + island["Name"] + " [" + island["Reward"] + "]\n"
 
-    embedresult_island = discord.Embed(title="오늘의 모험섬", color=discord.Color.gold())
+    embedresult_island = discord2.Embed(title="오늘의 모험섬", color=discord2.Color.gold())
 
     embedresult_island.add_field(
         name="▫️ "+response["IslandDate"],
@@ -294,7 +294,7 @@ def embedresult_gearlist(response:json):
     gearlist = ""
     gearlist2 = ""
 
-    embedresult_gearlist = discord.Embed(title="장비", color=discord.Color.brand_red())
+    embedresult_gearlist = discord2.Embed(title="장비", color=discord2.Color.brand_red())
 
     for items in ItemList:
         try:
@@ -363,7 +363,7 @@ def embedresult_gear2list(response:json):
     gearlist2 = ""
     gearlist3 = ""
 
-    embedresult_gear2list = discord.Embed(title="악세서리", color=discord.Color.brand_red())
+    embedresult_gear2list = discord2.Embed(title="악세서리", color=discord2.Color.brand_red())
 
     for items in ItemList:
         try:
