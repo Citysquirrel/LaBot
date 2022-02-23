@@ -27,12 +27,12 @@ from __future__ import annotations
 
 from typing import Literal, Optional, TypedDict, Union
 
-from .appinfo import PartialAppInfo
-from .channel import PartialChannel
+from .snowflake import Snowflake
 from .guild import InviteGuild, _GuildPreviewUnique
 from .scheduled_events import ScheduledEvent
-from .snowflake import Snowflake
+from .channel import PartialChannel
 from .user import PartialUser
+from .appinfo import PartialAppInfo
 
 InviteTargetType = Literal[1, 2]
 

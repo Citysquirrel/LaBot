@@ -24,10 +24,10 @@ DEALINGS IN THE SOFTWARE.
 """
 
 from typing import List, Literal, Optional, TypedDict, Union
-
-from .snowflake import Snowflake
-from .threads import ThreadArchiveDuration, ThreadMember, ThreadMetadata
 from .user import PartialUser
+from .snowflake import Snowflake
+from .threads import ThreadMetadata, ThreadMember, ThreadArchiveDuration
+
 
 OverwriteType = Literal[0, 1]
 
@@ -129,15 +129,7 @@ class ThreadChannel(_BaseChannel, _ThreadChannelOptional):
     thread_metadata: ThreadMetadata
 
 
-GuildChannel = Union[
-    TextChannel,
-    NewsChannel,
-    VoiceChannel,
-    CategoryChannel,
-    StoreChannel,
-    StageChannel,
-    ThreadChannel,
-]
+GuildChannel = Union[TextChannel, NewsChannel, VoiceChannel, CategoryChannel, StoreChannel, StageChannel, ThreadChannel]
 
 
 class DMChannel(_BaseChannel):

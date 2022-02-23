@@ -25,18 +25,16 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from typing import List, Optional, TypedDict
+from typing import TypedDict, List, Optional
 
-from .snowflake import Snowflake
 from .user import PartialUser
-
+from .snowflake import Snowflake
 
 class TeamMember(TypedDict):
     user: PartialUser
     membership_state: int
     permissions: List[str]
     team_id: Snowflake
-
 
 class Team(TypedDict):
     id: Snowflake

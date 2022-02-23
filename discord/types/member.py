@@ -24,7 +24,6 @@ DEALINGS IN THE SOFTWARE.
 """
 
 from typing import TypedDict
-
 from .snowflake import SnowflakeList
 from .user import User
 

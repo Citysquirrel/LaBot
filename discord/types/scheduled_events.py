@@ -24,14 +24,16 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
+from typing import TypedDict, Optional, Literal, Union
 from datetime import datetime
-from typing import Literal, Optional, TypedDict, Union
 
-from .channel import StageChannel, VoiceChannel
 from .guild import Guild
-from .member import Member
-from .snowflake import Snowflake
 from .user import User
+from .snowflake import Snowflake
+from .channel import StageChannel, VoiceChannel
+from .user import User
+from .member import Member
+
 
 ScheduledEventStatus = Literal[1, 2, 3, 4]
 ScheduledEventLocationType = Literal[1, 2, 3]
@@ -57,7 +59,6 @@ class ScheduledEvent(TypedDict):
     creator: Optional[User]
     location: ScheduledEventLocation
     privacy_level: ScheduledEventPrivacyLevel
-
 
 class ScheduledEventSubscriber(User):
     member: Optional[Member]

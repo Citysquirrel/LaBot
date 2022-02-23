@@ -25,15 +25,13 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypedDict, Union
-
-from .channel import ChannelType
+from typing import Optional, TYPE_CHECKING, Dict, TypedDict, Union, List, Literal
+from .snowflake import Snowflake
 from .components import Component, ComponentType
 from .embed import Embed
+from .channel import ChannelType
 from .member import Member
-from .message import Attachment
 from .role import Role
-from .snowflake import Snowflake
 from .user import User
 
 if TYPE_CHECKING:
@@ -41,7 +39,6 @@ if TYPE_CHECKING:
 
 
 ApplicationCommandType = Literal[1, 2, 3]
-
 
 class _ApplicationCommandOptional(TypedDict, total=False):
     options: List[ApplicationCommandOption]
@@ -60,7 +57,7 @@ class _ApplicationCommandOptionOptional(TypedDict, total=False):
     options: List[ApplicationCommandOption]
 
 
-ApplicationCommandOptionType = Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+ApplicationCommandOptionType = Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 
 class ApplicationCommandOption(_ApplicationCommandOptionOptional):
@@ -125,7 +122,7 @@ class _ApplicationCommandInteractionDataOptionBoolean(_ApplicationCommandInterac
 
 
 class _ApplicationCommandInteractionDataOptionSnowflake(_ApplicationCommandInteractionDataOption):
-    type: Literal[6, 7, 8, 9, 11]
+    type: Literal[6, 7, 8, 9]
     value: Snowflake
 
 
@@ -156,7 +153,6 @@ class ApplicationCommandInteractionDataResolved(TypedDict, total=False):
     members: Dict[Snowflake, Member]
     roles: Dict[Snowflake, Role]
     channels: Dict[Snowflake, ApplicationCommandResolvedPartialChannel]
-    attachments: Dict[Snowflake, Attachment]
 
 
 class _ApplicationCommandInteractionDataOptional(TypedDict, total=False):

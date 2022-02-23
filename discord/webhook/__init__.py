@@ -1,8 +1,8 @@
 """
 discord.webhook
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-Webhook support for the Discord API
+Webhook support
 
 :copyright: (c) 2015-2021 Rapptz & (c) 2021-present Pycord Development
 :license: MIT, see LICENSE for more details.

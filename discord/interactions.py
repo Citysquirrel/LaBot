@@ -26,59 +26,45 @@ DEALINGS IN THE SOFTWARE.
 """
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 from . import utils
+from .enums import try_enum, InteractionType, InteractionResponseType
+from .errors import InteractionResponded, ClientException, InvalidArgument
 from .channel import ChannelType, PartialMessageable
-from .enums import InteractionResponseType, InteractionType, try_enum
-from .errors import ClientException, InteractionResponded, InvalidArgument
 from .file import File
+from .user import User
 from .member import Member
-from .message import Attachment, Message
+from .message import Message, Attachment
 from .object import Object
 from .permissions import Permissions
-from .user import User
-from .webhook.async_ import Webhook, async_context, handle_message_parameters
+from .webhook.async_ import async_context, Webhook, handle_message_parameters
 
 __all__ = (
-    "Interaction",
-    "InteractionMessage",
-    "InteractionResponse",
-    "MessageInteraction",
+    'Interaction',
+    'InteractionMessage',
+    'InteractionResponse',
+    'MessageInteraction',
 )
 
 if TYPE_CHECKING:
-    from aiohttp import ClientSession
-
-    from .channel import (
-        CategoryChannel,
-        PartialMessageable,
-        StageChannel,
-        StoreChannel,
-        TextChannel,
-        VoiceChannel,
+    from .types.interactions import (
+        Interaction as InteractionPayload,
+        InteractionData,
+        MessageInteraction as MessageInteractionPayload
     )
-    from .commands import OptionChoice
-    from .embeds import Embed
     from .guild import Guild
-    from .mentions import AllowedMentions
     from .state import ConnectionState
-    from .threads import Thread
-    from .types.interactions import Interaction as InteractionPayload
-    from .types.interactions import InteractionData
-    from .types.interactions import MessageInteraction as MessageInteractionPayload
-    from .ui.modal import Modal
+    from .mentions import AllowedMentions
+    from aiohttp import ClientSession
+    from .embeds import Embed
     from .ui.view import View
+    from .channel import VoiceChannel, StageChannel, TextChannel, CategoryChannel, StoreChannel, PartialMessageable
+    from .threads import Thread
+    from .commands import OptionChoice
 
     InteractionChannel = Union[
-        VoiceChannel,
-        StageChannel,
-        TextChannel,
-        CategoryChannel,
-        StoreChannel,
-        Thread,
-        PartialMessageable,
+        VoiceChannel, StageChannel, TextChannel, CategoryChannel, StoreChannel, Thread, PartialMessageable
     ]
 
 
@@ -118,31 +104,28 @@ class Interaction:
         The users locale.
     guild_locale: :class:`str`
         The guilds preferred locale, if invoked in a guild.
-    custom_id: Optional[:class:`str`]
-        The custom ID for the interaction.
     """
 
     __slots__: Tuple[str, ...] = (
-        "id",
-        "type",
-        "guild_id",
-        "channel_id",
-        "data",
-        "application_id",
-        "message",
-        "user",
-        "locale",
-        "guild_locale",
-        "token",
-        "version",
-        "custom_id",
-        "_permissions",
-        "_state",
-        "_session",
-        "_original_message",
-        "_cs_response",
-        "_cs_followup",
-        "_cs_channel",
+        'id',
+        'type',
+        'guild_id',
+        'channel_id',
+        'data',
+        'application_id',
+        'message',
+        'user',
+        'locale',
+        'guild_locale',
+        'token',
+        'version',
+        '_permissions',
+        '_state',
+        '_session',
+        '_original_message',
+        '_cs_response',
+        '_cs_followup',
+        '_cs_channel',
     )
 
     def __init__(self, *, data: InteractionPayload, state: ConnectionState):
@@ -152,21 +135,20 @@ class Interaction:
         self._from_data(data)
 
     def _from_data(self, data: InteractionPayload):
-        self.id: int = int(data["id"])
-        self.type: InteractionType = try_enum(InteractionType, data["type"])
-        self.data: Optional[InteractionData] = data.get("data")
-        self.token: str = data["token"]
-        self.version: int = data["version"]
-        self.channel_id: Optional[int] = utils._get_as_snowflake(data, "channel_id")
-        self.guild_id: Optional[int] = utils._get_as_snowflake(data, "guild_id")
-        self.application_id: int = int(data["application_id"])
-        self.locale: Optional[str] = data.get("locale")
-        self.guild_locale: Optional[str] = data.get("guild_locale")
-        self.custom_id: Optional[str] = data.get("custom_id")
+        self.id: int = int(data['id'])
+        self.type: InteractionType = try_enum(InteractionType, data['type'])
+        self.data: Optional[InteractionData] = data.get('data')
+        self.token: str = data['token']
+        self.version: int = data['version']
+        self.channel_id: Optional[int] = utils._get_as_snowflake(data, 'channel_id')
+        self.guild_id: Optional[int] = utils._get_as_snowflake(data, 'guild_id')
+        self.application_id: int = int(data['application_id'])
+        self.locale: Optional[str] = data.get('locale')
+        self.guild_locale: Optional[str] = data.get('guild_locale')
 
         self.message: Optional[Message]
         try:
-            self.message = Message(state=self._state, channel=self.channel, data=data["message"])  # type: ignore
+            self.message = Message(state=self._state, channel=self.channel, data=data['message'])  # type: ignore
         except KeyError:
             self.message = None
 
@@ -177,15 +159,15 @@ class Interaction:
         if self.guild_id:
             guild = self.guild or Object(id=self.guild_id)
             try:
-                member = data["member"]  # type: ignore
+                member = data['member']  # type: ignore
             except KeyError:
                 pass
             else:
                 self.user = Member(state=self._state, guild=guild, data=member)  # type: ignore
-                self._permissions = int(member.get("permissions", 0))
+                self._permissions = int(member.get('permissions', 0))
         else:
             try:
-                self.user = User(state=self._state, data=data["user"])
+                self.user = User(state=self._state, data=data['user'])
             except KeyError:
                 pass
 
@@ -202,7 +184,7 @@ class Interaction:
         """:class:`bool`: Indicates whether the interaction is a message component."""
         return self.type == InteractionType.component
 
-    @utils.cached_slot_property("_cs_channel")
+    @utils.cached_slot_property('_cs_channel')
     def channel(self) -> Optional[InteractionChannel]:
         """Optional[Union[:class:`abc.GuildChannel`, :class:`PartialMessageable`, :class:`Thread`]]: The channel the interaction was sent from.
 
@@ -226,7 +208,7 @@ class Interaction:
         """
         return Permissions(self._permissions)
 
-    @utils.cached_slot_property("_cs_response")
+    @utils.cached_slot_property('_cs_response')
     def response(self) -> InteractionResponse:
         """:class:`InteractionResponse`: Returns an object responsible for handling responding to the interaction.
 
@@ -235,13 +217,13 @@ class Interaction:
         """
         return InteractionResponse(self)
 
-    @utils.cached_slot_property("_cs_followup")
+    @utils.cached_slot_property('_cs_followup')
     def followup(self) -> Webhook:
         """:class:`Webhook`: Returns the follow up webhook for follow up interactions."""
         payload = {
-            "id": self.application_id,
-            "type": 3,
-            "token": self.token,
+            'id': self.application_id,
+            'type': 3,
+            'token': self.token,
         }
         return Webhook.from_state(data=payload, state=self._state)
 
@@ -275,7 +257,7 @@ class Interaction:
         # TODO: fix later to not raise?
         channel = self.channel
         if channel is None:
-            raise ClientException("Channel for message could not be resolved")
+            raise ClientException('Channel for message could not be resolved')
 
         adapter = async_context.get()
         data = await adapter.get_original_interaction_response(
@@ -431,8 +413,8 @@ class InteractionResponse:
     """
 
     __slots__: Tuple[str, ...] = (
-        "_responded",
-        "_parent",
+        '_responded',
+        '_parent',
     )
 
     def __init__(self, parent: Interaction):
@@ -475,23 +457,19 @@ class InteractionResponse:
         parent = self._parent
         if parent.type is InteractionType.component:
             if ephemeral:
-                data = {"flags": 64}
+                data = {'flags': 64}
                 defer_type = InteractionResponseType.deferred_channel_message.value
             else:
                 defer_type = InteractionResponseType.deferred_message_update.value
-        elif parent.type in (InteractionType.application_command, InteractionType.modal_submit):
+        elif parent.type is InteractionType.application_command:
             defer_type = InteractionResponseType.deferred_channel_message.value
             if ephemeral:
-                data = {"flags": 64}
+                data = {'flags': 64}
 
         if defer_type:
             adapter = async_context.get()
             await adapter.create_interaction_response(
-                parent.id,
-                parent.token,
-                session=parent._session,
-                type=defer_type,
-                data=data,
+                parent.id, parent.token, session=parent._session, type=defer_type, data=data
             )
             self._responded = True
 
@@ -516,10 +494,7 @@ class InteractionResponse:
         if parent.type is InteractionType.ping:
             adapter = async_context.get()
             await adapter.create_interaction_response(
-                parent.id,
-                parent.token,
-                session=parent._session,
-                type=InteractionResponseType.pong.value,
+                parent.id, parent.token, session=parent._session, type=InteractionResponseType.pong.value
             )
             self._responded = True
 
@@ -527,15 +502,15 @@ class InteractionResponse:
         self,
         content: Optional[Any] = None,
         *,
-        embed: Embed = None,
-        embeds: List[Embed] = None,
-        view: View = None,
+        embed: Embed = MISSING,
+        embeds: List[Embed] = MISSING,
+        view: View = MISSING,
         tts: bool = False,
         ephemeral: bool = False,
         allowed_mentions: AllowedMentions = None,
         file: File = None,
         files: List[File] = None,
-        delete_after: float = None,
+        delete_after: float = None
     ) -> Interaction:
         """|coro|
 
@@ -569,7 +544,7 @@ class InteractionResponse:
             The file to upload.
         files: :class:`List[File]`
             A list of files to upload. Must be a maximum of 10.
-
+            
         Raises
         -------
         HTTPException
@@ -585,52 +560,53 @@ class InteractionResponse:
             raise InteractionResponded(self._parent)
 
         payload: Dict[str, Any] = {
-            "tts": tts,
+            'tts': tts,
         }
 
-        if embed is not None and embeds is not None:
-            raise TypeError("cannot mix embed and embeds keyword arguments")
+        if embed is not MISSING and embeds is not MISSING:
+            raise TypeError('cannot mix embed and embeds keyword arguments')
 
-        if embed is not None:
+        if embed is not MISSING and embed is not None:
             embeds = [embed]
 
         if embeds:
             if len(embeds) > 10:
-                raise ValueError("embeds cannot exceed maximum of 10 elements")
-            payload["embeds"] = [e.to_dict() for e in embeds]
+                raise ValueError('embeds cannot exceed maximum of 10 elements')
+            payload['embeds'] = [e.to_dict() for e in embeds]
 
         if content is not None:
-            payload["content"] = str(content)
+            payload['content'] = str(content)
 
         if ephemeral:
-            payload["flags"] = 64
+            payload['flags'] = 64
 
-        if view is not None:
-            payload["components"] = view.to_components()
+        if view is not MISSING and view is not None:
+            payload['components'] = view.to_components()
 
         state = self._parent._state
 
-        if allowed_mentions is None:
-            payload["allowed_mentions"] = state.allowed_mentions and state.allowed_mentions.to_dict()
-
-        elif state.allowed_mentions is not None:
-            payload["allowed_mentions"] = state.allowed_mentions.merge(allowed_mentions).to_dict()
+        if allowed_mentions is not None:
+            if state.allowed_mentions is not None:
+                payload['allowed_mentions'] = state.allowed_mentions.merge(allowed_mentions).to_dict()
+            else:
+                payload['allowed_mentions'] = allowed_mentions.to_dict()
         else:
-            payload["allowed_mentions"] = allowed_mentions.to_dict()
-        if file is not None and files is not None:
-            raise InvalidArgument("cannot pass both file and files parameter to send()")
+            payload['allowed_mentions'] = state.allowed_mentions and state.allowed_mentions.to_dict()
 
+        if file is not None and files is not None:
+            raise InvalidArgument('cannot pass both file and files parameter to send()')
+        
         if file is not None:
             if not isinstance(file, File):
-                raise InvalidArgument("file parameter must be File")
+                raise InvalidArgument('file parameter must be File')
             else:
                 files = [file]
 
         if files is not None:
             if len(files) > 10:
-                raise InvalidArgument("files parameter must be a list of up to 10 elements")
+                raise InvalidArgument('files parameter must be a list of up to 10 elements')
             elif not all(isinstance(file, File) for file in files):
-                raise InvalidArgument("files parameter must be a list of File")
+                raise InvalidArgument('files parameter must be a list of File')
 
         parent = self._parent
         adapter = async_context.get()
@@ -641,14 +617,14 @@ class InteractionResponse:
                 session=parent._session,
                 type=InteractionResponseType.channel_message.value,
                 data=payload,
-                files=files,
+                files=files
             )
         finally:
             if files:
                 for file in files:
                     file.close()
 
-        if view is not None:
+        if view is not MISSING and view is not None:
             if ephemeral and view.timeout is None:
                 view.timeout = 15 * 60.0
 
@@ -667,7 +643,7 @@ class InteractionResponse:
         embeds: List[Embed] = MISSING,
         attachments: List[Attachment] = MISSING,
         view: Optional[View] = MISSING,
-        delete_after: Optional[float] = None,
+        delete_after: Optional[float] = None
     ) -> None:
         """|coro|
 
@@ -715,21 +691,32 @@ class InteractionResponse:
 
         payload = {}
         if content is not MISSING:
-            payload["content"] = None if content is None else str(content)
+            if content is None:
+                payload['content'] = None
+            else:
+                payload['content'] = str(content)
+
         if embed is not MISSING and embeds is not MISSING:
-            raise TypeError("cannot mix both embed and embeds keyword arguments")
+            raise TypeError('cannot mix both embed and embeds keyword arguments')
 
         if embed is not MISSING:
-            embeds = [] if embed is None else [embed]
+            if embed is None:
+                embeds = []
+            else:
+                embeds = [embed]
+
         if embeds is not MISSING:
-            payload["embeds"] = [e.to_dict() for e in embeds]
+            payload['embeds'] = [e.to_dict() for e in embeds]
 
         if attachments is not MISSING:
-            payload["attachments"] = [a.to_dict() for a in attachments]
+            payload['attachments'] = [a.to_dict() for a in attachments]
 
         if view is not MISSING:
             state.prevent_view_updates_for(message_id)
-            payload["components"] = [] if view is None else view.to_components()
+            if view is None:
+                payload['components'] = []
+            else:
+                payload['components'] = view.to_components()
         adapter = async_context.get()
         await adapter.create_interaction_response(
             parent.id,
@@ -757,7 +744,7 @@ class InteractionResponse:
         Parameters
         -----------
         choices: List[:class:`OptionChoice`]
-            A list of choices.
+            A list of choices.  
 
         Raises
         -------
@@ -774,7 +761,9 @@ class InteractionResponse:
         if parent.type is not InteractionType.auto_complete:
             return
 
-        payload = {"choices": [c.to_dict() for c in choices]}
+        payload = {
+            "choices": [c.to_dict() for c in choices]
+        }
 
         adapter = async_context.get()
         await adapter.create_interaction_response(
@@ -786,42 +775,9 @@ class InteractionResponse:
         )
 
         self._responded = True
-
-    async def send_modal(self, modal: Modal):
-        """|coro|
-        Responds to this interaction by sending a modal dialog.
-        This cannot be used to respond to another modal dialog submission.
-
-        Parameters
-        ----------
-        modal: :class:`discord.ui.Modal`
-            The modal dialog to display to the user.
-
-        Raises
-        ------
-        HTTPException
-            Sending the modal failed.
-        InteractionResponded
-            This interaction has already been responded to before.
-        """
-        if self._responded:
-            raise InteractionResponded(self._parent)
-
-        payload = modal.to_dict()
-        adapter = async_context.get()
-        await adapter.create_interaction_response(
-            self._parent.id,
-            self._parent.token,
-            session=self._parent._session,
-            type=InteractionResponseType.modal.value,
-            data=payload,
-        )
-        self._responded = True
-        self._parent._state.store_modal(modal, self._parent.user.id)
-
-
+        
 class _InteractionMessageState:
-    __slots__ = ("_parent", "_interaction")
+    __slots__ = ('_parent', '_interaction')
 
     def __init__(self, interaction: Interaction, parent: ConnectionState):
         self._interaction: Interaction = interaction
@@ -930,7 +886,7 @@ class InteractionMessage(Message):
             attachments=attachments,
             view=view,
             allowed_mentions=allowed_mentions,
-            delete_after=delete_after,
+            delete_after=delete_after
         )
 
     async def delete(self, *, delay: Optional[float] = None) -> None:
@@ -981,12 +937,19 @@ class MessageInteraction:
         The raw interaction data.
     """
 
-    __slots__: Tuple[str, ...] = ("id", "type", "name", "user", "data", "_state")
+    __slots__: Tuple[str, ...] = (
+        'id',
+        'type',
+        'name',
+        'user',
+        'data',
+        '_state'
+    )
 
     def __init__(self, *, data: MessageInteractionPayload, state: ConnectionState):
         self._state = state
         self.data = data
-        self.id: int = int(data["id"])
-        self.type: InteractionType = data["type"]
-        self.name: str = data["name"]
-        self.user: User = self._state.store_user(data["user"])
+        self.id: int = int(data['id'])
+        self.type: InteractionType = data['type']
+        self.name: str = data['name']
+        self.user: User = self._state.store_user(data['user'])
