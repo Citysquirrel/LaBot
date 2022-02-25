@@ -186,6 +186,131 @@ async def 시세(ctx: discord.ApplicationContext):
             await ctx.respond("", embed=embederr, view=None)
             print(error)
 
+@client.slash_command(name="거래소",description="거래소 시세 검색")
+async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검색할 아이템을 입력하세요.", required=True, default=None)):
+    if ctx.guild is None:
+        await ctx.respond("DM금지")
+    else:
+        try:
+            if len(아이템) > 1:
+                await ctx.defer(ephemeral=False)
+
+                message = await ctx.interaction.original_message()
+
+                url = "http://152.70.248.4:5000/tradeplus/"+str(아이템)
+
+                loop = asyncio.get_event_loop()
+                response = loop.run_until_complete(get_req(url))
+
+                if response["Result"] == "Failed":
+                    if response["Reason"] == "No Result":
+                        embederr = discord.Embed(title="검색 결과가 없습니다.", color=discord.Color.red(), description="아바타 혹은 각인서는 검색이 불가능 할 수 있습니다.")
+                        await message.edit("", embed=embederr)
+                    if response["Reason"] == "Error":
+                        embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red(), description="아바타 혹은 각인서는 검색이 불가능 할 수 있습니다.")
+                        await ctx.respond("", embed=embederr, view=None)
+                    if response["Reason"] == "점검중":
+                        embederr = discord.Embed(title="현재 거래소 검색 기능은 점검중입니다.", color=discord.Color.red())
+                        await message.edit("", embed=embederr)
+                else:
+                    if len(response["Data"]) > 1:
+                        lists = ""
+                        i = 1
+                        for items in response["Data"]:
+                            lists = lists + "` "+str(i)+" ` " + items +"\n"
+                            i = i+1
+                        embedresult = discord.Embed(title="아이템 목록", color=discord.Color.gold())
+
+                        embedresult.add_field(
+                            name="▫️ 아이템 목록",
+                            value=(lists),
+                            inline=True
+                        )
+
+                        embedresult.set_footer(text="Made By 모코코더#3931", icon_url="https://cdn.discordapp.com/avatars/693421981705568346/f7cf118ca37e88b490ad1ac1489416ea.webp")                     
+
+                        number = response["FirstItem"][0][response["FirstItem"][0].find(":")+2:]
+                        percount = str(response["FirstItem"][1]).replace("개 단위","")
+
+                        if percount == "None":
+                            percount = "1"                        
+
+                        url2 = "http://152.70.248.4:5000/trade/"+str(number)
+                        response2 = loop.run_until_complete(get_req(url2))
+
+                        count = ""
+                        price = ""
+
+                        i = 1
+                        for itemchart in response2["Pricechart"]:
+                            priceraw = int(str(itemchart["Amount"]).replace(",",""))
+                            priceraw = priceraw/int(percount)
+                            count = count + "` "+str(i)+" ` " + str(priceraw).replace(".0","") +"\n"
+                            price = price + "[🪙`"+ str(itemchart["Price"]) +"`]" + "\n"
+                            i = i+1
+
+
+                        embedresult2 = discord.Embed(title="거래소", color=discord.Color.gold(), description="**["+response2["Name"]+"] "+percount+"개 단위**")
+
+                        embedresult2.add_field(
+                            name="▫️ 묶음 수량",
+                            value=(count),
+                            inline=True
+                        )
+                        embedresult2.add_field(
+                            name="▫️ 묶음 당 가격",
+                            value=(price),
+                            inline=True
+                        )
+
+                        embedresult2.set_footer(text="Made By 모코코더#3931", icon_url="https://cdn.discordapp.com/avatars/693421981705568346/f7cf118ca37e88b490ad1ac1489416ea.webp")                     
+
+                        await message.edit("", embed=embedresult, view=TradeOption(ctx, 아이템, message, embedresult, embedresult2))
+                    else:
+                        number = response["FirstItem"][0][response["FirstItem"][0].find(":")+2:]
+                        percount = str(response["FirstItem"][1]).replace("개 단위","")
+
+                        if percount == "None":
+                            percount = "1"                        
+
+                        url2 = "http://152.70.248.4:5000/trade/"+str(number)
+                        response2 = loop.run_until_complete(get_req(url2))
+
+                        count = ""
+                        price = ""
+
+                        i = 1
+                        for itemchart in response2["Pricechart"]:
+                            priceraw = int(str(itemchart["Amount"]).replace(",",""))
+                            priceraw = priceraw/int(percount)
+                            count = count + "` "+str(i)+" ` " + str(priceraw).replace(".0","") +"\n"
+                            price = price + "[🪙`"+ str(itemchart["Price"]) +"`]" + "\n"
+                            i = i+1
+
+
+                        embedresult = discord.Embed(title="거래소", color=discord.Color.gold(), description="**["+response2["Name"]+"] "+percount+"개 단위**")
+
+                        embedresult.add_field(
+                            name="▫️ 묶음 수량",
+                            value=(count),
+                            inline=True
+                        )
+                        embedresult.add_field(
+                            name="▫️ 묶음 당 가격",
+                            value=(price),
+                            inline=True
+                        )
+
+                        embedresult.set_footer(text="Made By 모코코더#3931", icon_url="https://cdn.discordapp.com/avatars/693421981705568346/f7cf118ca37e88b490ad1ac1489416ea.webp")                     
+
+                        await message.edit("", embed=embedresult)
+            else:
+                await ctx.respond("2글자 이상으로 검색해주세요.")
+        except Exception as error:
+            embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red(), description="아바타 혹은 각인서는 검색이 불가능 할 수 있습니다.")
+            await ctx.respond("", embed=embederr, view=None)
+            print(error)
+
 class InfoOptions(discord.ui.View):
     def __init__(self, ctx: commands.Context, 닉네임: str, msg: discord.Message, embedres: discord.Embed, embedres2: discord.Embed, embedres3: discord.Embed, embedres4: discord.Embed, embedres5: discord.Embed, embedres6: discord.Embed, embedres7: discord.Embed, embedres8: discord.Embed):
         super().__init__()
@@ -246,5 +371,29 @@ class InfoOptions(discord.ui.View):
     async def ChaList(self, button: discord.ui.Button, interaction: discord.Interaction):
         if not (str(interaction.message.embeds[0].title)) == "캐릭터 목록":
             await interaction.response.edit_message(embed=self.embedres2, view=self)  
+
+class TradeOption(discord.ui.View):
+    def __init__(self, ctx: commands.Context, 아이템: str, msg: discord.Message, embedres: discord.Embed, embedres2: discord.Embed):
+        super().__init__()
+        self.ctx = ctx
+        self.아이템 = 아이템
+        self.msg = msg
+        self.embedres = embedres
+        self.embedres2 = embedres2
+        # self.add_item(discord.ui.Select(options=[
+        #     discord.SelectOption(
+        #         label="test"
+        #     )
+        # ]))
+
+    @discord.ui.button(label="목록", style=discord.ButtonStyle.gray, custom_id="Chainfo")
+    async def Chainfo(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if not (str(interaction.message.embeds[0].author.name)) == "아이템 목록":
+            await interaction.response.edit_message(embed=self.embedres, view=self)
+
+    @discord.ui.button(label="첫번째 아이템 보기", style=discord.ButtonStyle.gray, custom_id="ChaSkill")
+    async def ChaSkill(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if not (str(interaction.message.embeds[0].title)) == "거래소":
+            await interaction.response.edit_message(embed=self.embedres2, view=self)
 
 client.run(token)
