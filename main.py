@@ -412,4 +412,27 @@ class TradeOption(discord.ui.View):
         if not (str(interaction.message.embeds[0].title)) == "거래소":
             await interaction.response.edit_message(embed=self.embedres2, view=self)
 
+class HelpOption(discord.ui.View):
+    def __init__(self, ctx: commands.Context, msg: discord.Message):
+        super().__init__()
+        self.ctx = ctx
+        self.msg = msg
+        # self.add_item(discord.ui.Select(options=[
+        #     discord.SelectOption(
+        #         label="test"
+        #     )
+        # ]))
+
+    @discord.ui.button(label="발탄", style=discord.ButtonStyle.gray, custom_id="Bal")
+    async def Bal(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://media.discordapp.net/attachments/935529009251487810/946768903583973426/i13704437401.jpeg", view=self)
+
+    @discord.ui.button(label="비아", style=discord.ButtonStyle.gray, custom_id="Bia")
+    async def Bia(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946774184451801088/i14057139075.jpeg", view=self)
+
+    @discord.ui.button(label="쿠크", style=discord.ButtonStyle.gray, custom_id="Cu")
+    async def Cu(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946775136462311554/i15518900640.jpg", view=self)
+
 client.run(token)
