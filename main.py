@@ -200,17 +200,17 @@ async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검
                 url = "http://152.70.248.4:5000/tradeplus/"+str(아이템)
 
                 loop = asyncio.get_event_loop()
-                response = loop.run_until_complete(get_req(url))
+                response = loop.run_until_complete(get_req2(url))
 
                 if response["Result"] == "Failed":
                     if response["Reason"] == "No Result":
-                        embederr = discord.Embed(title="검색 결과가 없습니다.", color=discord.Color.red(), description="아바타 혹은 각인서는 검색이 불가능 할 수 있습니다.")
+                        embederr = discord.Embed(title="검색 결과가 없습니다.", color=discord.Color.red(), description="아바타는 검색이 불가능합니다.")
                         await message.edit("", embed=embederr)
                     if response["Reason"] == "Error":
-                        embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red(), description="아바타 혹은 각인서는 검색이 불가능 할 수 있습니다.")
+                        embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red(), description="아바타는 검색이 불가능합니다.")
                         await ctx.respond("", embed=embederr, view=None)
-                    if response["Reason"] == "점검중":
-                        embederr = discord.Embed(title="현재 거래소 검색 기능은 점검중입니다.", color=discord.Color.red())
+                    if response["Reason"] == "Too many results":
+                        embederr = discord.Embed(title="너무 많은 검색 결과가 있습니다. 더 자세하게 검색 해 주세요.", color=discord.Color.red())
                         await message.edit("", embed=embederr)
                 else:
                     if len(response["Data"]) > 1:
@@ -229,14 +229,15 @@ async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검
 
                         embedresult.set_footer(text="Made By 모코코더#3931", icon_url="https://cdn.discordapp.com/avatars/693421981705568346/f7cf118ca37e88b490ad1ac1489416ea.webp")                     
 
-                        number = response["FirstItem"][0][response["FirstItem"][0].find(":")+2:]
+                        number = response["FirstItem"][0][response["FirstItem"][0].rfind(":")+2:]
+                        itemgrade = response["FirstItem"][0][:response["FirstItem"][0].find(" ")]
                         percount = str(response["FirstItem"][1]).replace("개 단위","")
 
                         if percount == "None":
                             percount = "1"                        
 
                         url2 = "http://152.70.248.4:5000/trade/"+str(number)
-                        response2 = loop.run_until_complete(get_req(url2))
+                        response2 = loop.run_until_complete(get_req2(url2))
 
                         count = ""
                         price = ""
@@ -250,7 +251,7 @@ async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검
                             i = i+1
 
 
-                        embedresult2 = discord.Embed(title="거래소", color=discord.Color.gold(), description="**["+response2["Name"]+"] "+percount+"개 단위**")
+                        embedresult2 = discord.Embed(title="거래소", color=discord.Color.gold(), description="**["+ itemgrade +"]["+response2["Name"]+"] "+percount+"개 단위**")
 
                         embedresult2.add_field(
                             name="▫️ 묶음 수량",
@@ -267,14 +268,15 @@ async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검
 
                         await message.edit("", embed=embedresult, view=TradeOption(ctx, 아이템, message, embedresult, embedresult2))
                     else:
-                        number = response["FirstItem"][0][response["FirstItem"][0].find(":")+2:]
+                        number = response["FirstItem"][0][response["FirstItem"][0].rfind(":")+2:]
                         percount = str(response["FirstItem"][1]).replace("개 단위","")
+                        itemgrade = response["FirstItem"][0][:response["FirstItem"][0].find(" ")]
 
                         if percount == "None":
                             percount = "1"                        
 
                         url2 = "http://152.70.248.4:5000/trade/"+str(number)
-                        response2 = loop.run_until_complete(get_req(url2))
+                        response2 = loop.run_until_complete(get_req2(url2))
 
                         count = ""
                         price = ""
@@ -288,7 +290,7 @@ async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검
                             i = i+1
 
 
-                        embedresult = discord.Embed(title="거래소", color=discord.Color.gold(), description="**["+response2["Name"]+"] "+percount+"개 단위**")
+                        embedresult = discord.Embed(title="거래소", color=discord.Color.gold(), description="**["+ itemgrade +"]["+response2["Name"]+"] "+percount+"개 단위**")
 
                         embedresult.add_field(
                             name="▫️ 묶음 수량",
@@ -307,7 +309,21 @@ async def 거래소(ctx: discord.ApplicationContext, 아이템: Option(str, "검
             else:
                 await ctx.respond("2글자 이상으로 검색해주세요.")
         except Exception as error:
-            embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red(), description="아바타 혹은 각인서는 검색이 불가능 할 수 있습니다.")
+            embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red(), description="아바타는 검색이 불가능합니다.")
+            await ctx.respond("", embed=embederr, view=None)
+            print(error)
+
+@client.slash_command(name="공략",description="공략 확인")
+async def 공략(ctx: discord.ApplicationContext):
+    if ctx.guild is None:
+        await ctx.respond("DM금지")
+    else:
+        try:          
+            await ctx.defer(ephemeral=False)
+            message = await ctx.interaction.original_message()
+            await message.edit("https://media.discordapp.net/attachments/935529009251487810/946768903583973426/i13704437401.jpeg", view=HelpOption(ctx,message))
+        except Exception as error:
+            embederr = discord.Embed(title="알 수 없는 오류가 발생했습니다.", color=discord.Color.red())
             await ctx.respond("", embed=embederr, view=None)
             print(error)
 
