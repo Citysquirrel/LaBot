@@ -434,5 +434,21 @@ class HelpOption(discord.ui.View):
     @discord.ui.button(label="쿠크", style=discord.ButtonStyle.gray, custom_id="Cu")
     async def Cu(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946775136462311554/i15518900640.jpg", view=self)
+    
+    @discord.ui.button(label="아브 1관", style=discord.ButtonStyle.gray, custom_id="Ab1")
+    async def Cu(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946775136462311554/i15518900640.jpg", view=self)
+
+    @discord.ui.button(label="아브 2관", style=discord.ButtonStyle.gray, custom_id="Ab2")
+    async def Cu(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946775136462311554/i15518900640.jpg", view=self)
+
+    @discord.ui.button(label="아브 3관", style=discord.ButtonStyle.gray, custom_id="Ab3")
+    async def Cu(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946775136462311554/i15518900640.jpg", view=self)
+
+    @discord.ui.button(label="아브 4관", style=discord.ButtonStyle.gray, custom_id="Ab4")
+    async def Cu(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.msg.edit("https://cdn.discordapp.com/attachments/935529009251487810/946775136462311554/i15518900640.jpg", view=self)
 
 client.run(token)
